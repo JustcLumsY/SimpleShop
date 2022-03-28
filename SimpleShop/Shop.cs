@@ -27,25 +27,49 @@ namespace SimpleShop
             while (true)
             {
                 Console.Clear();
-                shop.PrintShopList();
+                PrintShopList();
                 Console.WriteLine();
                 Console.WriteLine("What do you want to buy?");
                 Console.WriteLine();
-                shop.ShowShoppingCart();
-                var userInput = Console.ReadLine();
-                shop.AddToCart(userInput);
+                ShowShoppingCart();
+                var userInput = Console.ReadLine();             
+                AddToCart(userInput);
                 if (userInput == "P".ToLower())
                 {
-                    shop.BuyCart(customer);
+                    CheckBalance(customer);         
+                    BuyCart(shop, customer);
                     Console.ReadLine();
                     return;
                 }
             }
         }
-        public void BuyCart(Customer customer)
+
+        private void CheckBalance(Customer customer)
+        {
+            if (customer.BankInformation.Balance < totalPrice)
+            {
+                Console.WriteLine("Not enough balance");
+                Console.ReadLine();
+                Environment.Exit(0);
+            }
+        }
+
+        public void BuyCart(Shop shop, Customer customer)
         {           
-            customer.BankInformation.Balance -= totalPrice;
-            Console.WriteLine($"You bought all items in the cart for: {totalPrice} NOK");
+            Console.WriteLine($"Your balance: {customer.BankInformation.Balance} NOK");
+            Console.WriteLine("Write YES/NO to continue");
+            var userinput = Console.ReadLine();
+            if (userinput == "YES".ToLower())
+            {
+                customer.BankInformation.Balance -= totalPrice;
+                Console.WriteLine($"You bought all items in the cart for: {totalPrice} NOK");
+            }
+            else if (userinput == "NO".ToLower())
+            {
+                totalPrice = 0;
+                cart.Clear();
+                RunShop(shop, customer);
+            }
         }
 
         public void AddToCart(string userInput)
